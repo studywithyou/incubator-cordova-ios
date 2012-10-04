@@ -385,6 +385,11 @@
 #pragma mark -
 #pragma mark Over-rides
 
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];   // this will remove all notification unless added using addObserverForName:object:queue:usingBlock:
+}
+
 @end
 
 #pragma mark -
