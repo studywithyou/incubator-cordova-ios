@@ -49,7 +49,7 @@
 @end
 
 @implementation CDVCapture
-@synthesize inUse;
+@synthesize inUse, pickerController;
 
 - (id)initWithWebView:(UIWebView*)theWebView
 {
@@ -120,16 +120,16 @@
         CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageToErrorObject:CAPTURE_NOT_SUPPORTED];
         [self.commandDelegate sendPluginResult:result callbackId:callbackId];
     } else {
-        if (pickerController == nil) {
-            pickerController = [[CDVImagePicker alloc] init];
+        if (self.pickerController == nil) {
+            self.pickerController = [[CDVImagePicker alloc] init];
         }
 
-        pickerController.delegate = self;
-        pickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
-        pickerController.allowsEditing = NO;
-        if ([pickerController respondsToSelector:@selector(mediaTypes)]) {
+        self.pickerController.delegate = self;
+        self.pickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
+        self.pickerController.allowsEditing = NO;
+        if ([self.pickerController respondsToSelector:@selector(mediaTypes)]) {
             // iOS 3.0
-            pickerController.mediaTypes = [NSArray arrayWithObjects:(NSString*)kUTTypeImage, nil];
+            self.pickerController.mediaTypes = [NSArray arrayWithObjects:(NSString*)kUTTypeImage, nil];
         }
 
         /*if ([pickerController respondsToSelector:@selector(cameraCaptureMode)]){
@@ -139,13 +139,13 @@
             pickerController.cameraFlashMode = UIImagePickerControllerCameraFlashModeAuto;
         }*/
         // CDVImagePicker specific property
-        pickerController.callbackId = callbackId;
-        pickerController.mimeType = mode;
+        self.pickerController.callbackId = callbackId;
+        self.pickerController.mimeType = mode;
 
         if ([self.viewController respondsToSelector:@selector(presentViewController:::)]) {
-            [self.viewController presentViewController:pickerController animated:YES completion:nil];
+            [self.viewController presentViewController:self.pickerController animated:YES completion:nil];
         } else {
-            [self.viewController presentModalViewController:pickerController animated:YES];
+            [self.viewController presentModalViewController:self.pickerController animated:YES];
         }
     }
 }
@@ -214,7 +214,7 @@
 
     if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
         // there is a camera, it is available, make sure it can do movies
-        pickerController = [[CDVImagePicker alloc] init];
+        self.pickerController = [[CDVImagePicker alloc] init];
 
         NSArray* types = nil;
         if ([UIImagePickerController respondsToSelector:@selector(availableMediaTypesForSourceType:)]) {
@@ -233,12 +233,13 @@
         NSLog(@"Capture.captureVideo: video mode not available.");
         CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageToErrorObject:CAPTURE_NOT_SUPPORTED];
         [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+        self.pickerController = nil;
     } else {
-        pickerController.delegate = self;
-        pickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
-        pickerController.allowsEditing = NO;
+        self.pickerController.delegate = self;
+        self.pickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
+        self.pickerController.allowsEditing = NO;
         // iOS 3.0
-        pickerController.mediaTypes = [NSArray arrayWithObjects:mediaType, nil];
+        self.pickerController.mediaTypes = [NSArray arrayWithObjects:mediaType, nil];
 
         /*if ([mediaType isEqualToString:(NSString*)kUTTypeMovie]){
             if (duration) {
@@ -248,19 +249,19 @@
         }*/
 
         // iOS 4.0
-        if ([pickerController respondsToSelector:@selector(cameraCaptureMode)]) {
-            pickerController.cameraCaptureMode = UIImagePickerControllerCameraCaptureModeVideo;
-            pickerController.videoQuality = UIImagePickerControllerQualityTypeHigh;
-            // pickerController.cameraDevice = UIImagePickerControllerCameraDeviceRear;
-            // pickerController.cameraFlashMode = UIImagePickerControllerCameraFlashModeAuto;
+        if ([self.pickerController respondsToSelector:@selector(cameraCaptureMode)]) {
+            self.pickerController.cameraCaptureMode = UIImagePickerControllerCameraCaptureModeVideo;
+            self.pickerController.videoQuality = UIImagePickerControllerQualityTypeHigh;
+            // self.pickerController.cameraDevice = UIImagePickerControllerCameraDeviceRear;
+            // self.pickerController.cameraFlashMode = UIImagePickerControllerCameraFlashModeAuto;
         }
         // CDVImagePicker specific property
-        pickerController.callbackId = callbackId;
+        self.pickerController.callbackId = callbackId;
 
         if ([self.viewController respondsToSelector:@selector(presentViewController:::)]) {
-            [self.viewController presentViewController:pickerController animated:YES completion:nil];
+            [self.viewController presentViewController:self.pickerController animated:YES completion:nil];
         } else {
-            [self.viewController presentModalViewController:pickerController animated:YES];
+            [self.viewController presentModalViewController:self.pickerController animated:YES];
         }
     }
 }
@@ -496,6 +497,7 @@
         result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageToErrorObject:CAPTURE_INTERNAL_ERR];
     }
     [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+    self.pickerController = nil;
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController*)picker
@@ -511,6 +513,7 @@
 
     CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageToErrorObject:CAPTURE_NO_MEDIA_FILES];
     [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+    self.pickerController = nil;
 }
 
 @end

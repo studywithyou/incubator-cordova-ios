@@ -94,7 +94,7 @@ static NSSet* org_apache_cordova_validArrowDirections;
     }
 
     CDVCameraPicker* cameraPicker = [[CDVCameraPicker alloc] init];
-    self.pickerController = cameraPicker;
+    self.pickerController = cameraPicker;  // stored as weak reference so must be alloc'ed each use
 
     cameraPicker.delegate = self;
     cameraPicker.sourceType = sourceType;
@@ -209,6 +209,7 @@ static NSSet* org_apache_cordova_validArrowDirections;
         [self.commandDelegate sendPluginResult:result callbackId:callbackId];
     }
     self.hasPendingOperation = NO;
+    self.pickerController = nil;
 }
 
 - (void)imagePickerController:(UIImagePickerController*)picker didFinishPickingMediaWithInfo:(NSDictionary*)info
@@ -302,6 +303,7 @@ static NSSet* org_apache_cordova_validArrowDirections;
     }
 
     self.hasPendingOperation = NO;
+    self.pickerController = nil;
 }
 
 // older api calls newer didFinishPickingMediaWithInfo
@@ -327,6 +329,7 @@ static NSSet* org_apache_cordova_validArrowDirections;
     [self.commandDelegate sendPluginResult:result callbackId:cameraPicker.callbackId];
 
     self.hasPendingOperation = NO;
+    self.pickerController = nil;
 }
 
 - (UIImage*)imageByScalingAndCroppingForSize:(UIImage*)anImage toSize:(CGSize)targetSize

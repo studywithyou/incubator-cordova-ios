@@ -64,7 +64,7 @@ typedef NSUInteger CDVMediaType;
     UIPopoverControllerDelegate>
 {}
 
-@property (strong) CDVCameraPicker* pickerController;
+@property (unsafe_unretained) CDVCameraPicker* pickerController;
 
 /*
  * getPicture
